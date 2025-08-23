@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from models.user import User
 from schema.user import UserCreate
 from . import organization as crud_org # Importante añadir esto
-
+from auth.security import get_password_hash, verify_password
 def get_user(db: Session, user_id: int):
     return db.query(User).filter(User.id == user_id).first()
 
@@ -10,11 +10,11 @@ def get_user_by_email(db: Session, email: str):
     return db.query(User).filter(User.email == email).first()
 
 def create_user(db: Session, user: UserCreate):
-    fake_hashed = user.password + "notreallyhashed"
+    hashed_password = get_password_hash(user.password)
     db_user = User(
         email=user.email,
         full_name=user.full_name,
-        hashed_password=fake_hashed,
+        hashed_password=hashed_password,
         address_id=user.address_id
     )
     db.add(db_user)
