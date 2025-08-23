@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Integer, String, ForeignKey, Table, Column
 from db.database import Base
+from typing import List
 
 # Tabla intermedia para Many-to-Many entre users y organizations
 user_organization = Table(
@@ -17,10 +18,13 @@ class Organization(Base):
     name: Mapped[str] = mapped_column(String(100))
 
     # relación muchos-a-muchos con User
-    users: Mapped[list["User"]] = relationship(
+    users: Mapped[List["User"]] = relationship(
         secondary=user_organization, back_populates="organizations"
     )
 
     # relación muchos-a-uno con Address
     address_id: Mapped[int] = mapped_column(ForeignKey("addresses.id"))
     address: Mapped["Address"] = relationship(back_populates="organizations")
+
+    # relación uno-a-muchos con Server
+    servers: Mapped[List["Server"]] = relationship(back_populates="organization")
